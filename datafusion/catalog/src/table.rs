@@ -297,6 +297,28 @@ pub trait TableProvider: Debug + Sync + Send {
     ) -> Result<Arc<dyn ExecutionPlan>> {
         not_impl_err!("Insert into not implemented for this table")
     }
+
+    /// Return an [`ExecutionPlan`] to update data in this table, if
+    /// supported.
+    ///
+    /// The returned plan should return a single row in a UInt64
+    /// column called "count" such as the following
+    ///
+    /// ```text
+    /// +-------+,
+    /// | count |,
+    /// +-------+,
+    /// | 6     |,
+    /// +-------+,
+    /// ```
+    ///
+    async fn update(
+        &self,
+        _state: &dyn Session,
+        _input: Arc<dyn ExecutionPlan>,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        not_impl_err!("Update not implemented for this table")
+    }
 }
 
 /// A factory which creates [`TableProvider`]s at runtime given a URL.

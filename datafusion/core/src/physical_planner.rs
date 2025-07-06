@@ -1256,6 +1256,25 @@ impl DefaultPhysicalPlanner {
                 let name = statement.name();
                 return not_impl_err!("Unsupported logical plan: Statement({name})");
             }
+            LogicalPlan::Dml(DmlStatement {
+                target,
+                op: WriteOp::Update,
+                ..
+            }) => {
+                if let Some(provider) =
+                    target.as_any().downcast_ref::<DefaultTableSource>()
+                {
+                    let input_exec = children.one()?;
+                    provider
+                        .table_provider
+                        .update(session_state, input_exec)
+                        .await?
+                } else {
+                    return exec_err!(
+                        "Table source can't be downcasted to DefaultTableSource"
+                    );
+                }
+            }
             LogicalPlan::Dml(dml) => {
                 // DataFusion is a read-only query engine, but also a library, so consumers may implement this
                 return not_impl_err!("Unsupported logical plan: Dml({0})", dml.op);
