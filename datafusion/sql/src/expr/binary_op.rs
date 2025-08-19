@@ -68,7 +68,11 @@ impl<S: ContextProvider> SqlToRel<'_, S> {
             BinaryOperator::Question => Ok(Operator::Question),
             BinaryOperator::QuestionAnd => Ok(Operator::QuestionAnd),
             BinaryOperator::QuestionPipe => Ok(Operator::QuestionPipe),
-            BinaryOperator::PGCustomBinaryOperator(custom) if custom == ["pg_catalog", "~"] => Ok(Operator::RegexMatch),
+            BinaryOperator::PGCustomBinaryOperator(custom)
+                if custom == ["pg_catalog", "~"] =>
+            {
+                Ok(Operator::RegexMatch)
+            }
             _ => not_impl_err!("Unsupported binary operator: {:?}", op),
         }
     }
